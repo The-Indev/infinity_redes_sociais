@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INDEV · Gerador de Conteúdo I.A.</title>
+    <style>
+        :root {
+            --bg-principal: #050505;
+            --bg-card: #0d0d0d;
+            --dourado: #d4af37;
+            --dourado-hover: #f3cf55;
+            --texto-claro: #ffffff;
+            --texto-mutado: #8a8a8a;
+            --borda: #1a1a1a;
+            --borda-foco: #333333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texto-claro);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            background: var(--bg-card);
+            border: 1px solid var(--borda);
+            border-radius: 14px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-svg {
+            width: 70px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: var(--texto-claro);
+            text-transform: uppercase;
+        }
+
+        .header h1 span {
+            color: var(--dourado);
+        }
+
+        .header p {
+            color: var(--texto-mutado);
+            font-size: 13px;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--dourado);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .webhook-static {
+            background-color: #000000;
+            border: 1px solid var(--borda);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--texto-mutado);
+            font-size: 14px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        textarea {
+            width: 100%;
+            background-color: #000000;
+            border: 1px solid var(--borda);
+            border-radius: 8px;
+            padding: 16px;
+            color: var(--texto-claro);
+            font-size: 15px;
+            line-height: 1.6;
+            resize: vertical;
+            min-height: 280px;
+            transition: all 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--dourado);
+            box-shadow: 0 0 0 1px var(--dourado);
+        }
+
+        .btn-enviar {
+            width: 100%;
+            background: linear-gradient(135deg, #b8972f 0%, var(--dourado) 100%);
+            color: #000000;
+            border: none;
+            border-radius: 8px;
+            padding: 18px;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 10px;
+        }
+
+        .btn-enviar:hover {
+            background: linear-gradient(135deg, var(--dourado) 0%, var(--dourado-hover) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(212, 175, 55, 0.25);
+        }
+
+        .btn-enviar:active {
+            transform: translateY(1px);
+        }
+
+        .status-message {
+            margin-top: 24px;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+        }
+
+        .status-loading {
+            display: block;
+            background-color: rgba(212, 175, 55, 0.05);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: var(--dourado);
+        }
+
+        .status-success {
+            display: block;
+            background-color: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.4);
+            color: #4cd137;
+        }
+
+        .status-error {
+            display: block;
+            background-color: rgba(220, 53, 69, 0.1);
+            border: 1px solid rgba(220, 53, 69, 0.4);
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <svg class="logo-svg" viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 13c-6.63 0-12 5.37-12 12s5.37 12 12 12c4.42 0 8.29-2.39 10.41-5.94L50 25l9.59-6.06C61.71 15.39 65.58 13 70 13c6.63 0 12 5.37 12 12s-5.37 12-12 12c-4.42 0-8.29-2.39-10.41-5.94L50 25l-9.59 6.06C38.29 34.61 34.42 37 30 37c-6.63 0-12-5.37-12-12s5.37-12 12-12m40-3c-8.05 0-14.88 4.75-18 11.58C48.88 14.75 42.05 10 34 10 22.95 10 14 18.95 14 30s8.95 20 20 20c8.05 0 14.88-4.75 18-11.58 3.12 6.83 9.95 11.58 18 11.58 11.05 0 20-8.95 20-20S81.05 10 70 10z" fill="#d4af37"/>
+        </svg>
+        <h1>INDEV · <span>Códice Studio</span></h1>
+        <p>Infraestrutura de Automação e Distribuição de Conteúdo B2B</p>
+    </div>
+
+    <form id="webhookForm">
+        <div class="form-group">
+            <label>Destino do Pipeline (Fixo)</label>
+            <div class="webhook-static">https://n8n.infinitydev.tech/webhook/coletor</div>
+        </div>
+
+        <div class="form-group">
+            <label for="artigoTexto">Texto ou Artigo Base</label>
+            <textarea id="artigoTexto" placeholder="Cole aqui o artigo ou texto bruto completo para ser fragmentado em 10 posts..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-enviar">Disparar Automação</button>
+    </form>
+
+    <div id="status" class="status-message"></div>
+</div>
+
+<script>
+    document.getElementById('webhookForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const webhookUrl = "https://n8n.infinitydev.tech/webhook/coletor";
+        const artigoTexto = document.getElementById('artigoTexto').value.trim();
+        const statusDiv = document.getElementById('status');
+        
+        statusDiv.innerText = 'Enviando dados para o pipeline do n8n...';
+        statusDiv.className = 'status-message status-loading';
+
+        try {
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    timestamp: new Date().toISOString(),
+                    artigo_completo: artigoTexto
+                })
+            });
+
+            if (response.ok) {
+                statusDiv.innerText = 'Sucesso! O artigo foi enviado e o pipeline de 10 posts foi iniciado.';
+                statusDiv.className = 'status-message status-success';
+                document.getElementById('artigoTexto').value = '';
+            } else {
+                statusDiv.innerText = 'Erro ao enviar: O servidor retornou o status ' + response.status;
+                statusDiv.className = 'status-message status-error';
+            }
+        } catch (error) {
+            statusDiv.innerText = 'Falha na conexão: Verifique se o webhook está ativo no n8n ou se há bloqueio de CORS.';
+            statusDiv.className = 'status-message status-error';
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+services:
+  painel-auditor:
+    build: .
+    container_name: painel-auditor
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_SCHEMA: ${SUPABASE_SCHEMA:-infinity_redes_sociais}
+      WEBHOOK_APROVACAO: ${WEBHOOK_APROVACAO}
+      WEBHOOK_IMAGEM: ${WEBHOOK_IMAGEM:-https://n8n.space-cloud.tech/webhook/imagem}
+      WEBHOOK_COLETOR: ${WEBHOOK_COLETOR:-https://n8n.infinitydev.tech/webhook/coletor}
+      # URL pública que o NAVEGADOR usa para chamar o video-service.
+      # Em dev/local: http://localhost:3001. Em produção: o domínio/porta expostos.
+      VIDEO_SERVICE_URL: ${VIDEO_SERVICE_URL:-http://localhost:3001}
+
+  video-service:
+    build: ./video-service
+    container_name: video-service
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      SUPABASE_URL: ${SUPABASE_URL}
+      # Use a service_role key aqui (upload no Storage + update sem esbarrar em RLS)
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-${SUPABASE_ANON_KEY}}
+      SUPABASE_SCHEMA: ${SUPABASE_SCHEMA:-infinity_redes_sociais}
+      SUPABASE_VIDEO_BUCKET: ${SUPABASE_VIDEO_BUCKET:-videos}
+      SUPABASE_TABELA: ${SUPABASE_TABELA:-posts_gerados}
+      SUPABASE_COLUNA_VIDEO: ${SUPABASE_COLUNA_VIDEO:-url_video_gerado}
+      DURACAO_PADRAO: ${DURACAO_PADRAO:-30}
