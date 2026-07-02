@@ -1,0 +1,10 @@
+# Contexto de build = raiz do repositório.
+.git
+**/node_modules
+**/dist
+**/.env
+**/.env.local
+**/.env.*.local
+*.log
+**/*.log
+**/.vite

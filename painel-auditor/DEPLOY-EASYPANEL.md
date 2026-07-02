@@ -1,17 +1,20 @@
 # Deploy no EasyPanel
 
-O painel + o serviço de vídeo sobem numa **imagem única** (`Dockerfile.easypanel`):
-o nginx serve o frontend e faz proxy de `/api/` para o video-service (node+ffmpeg)
-rodando internamente na porta 3001. Assim não há CORS nem URL externa a configurar.
+O painel + o serviço de vídeo sobem numa **imagem única** (o `Dockerfile` na
+**raiz** do repositório): o nginx serve o frontend e faz proxy de `/api/` para o
+video-service (node+ffmpeg) na porta interna 3001. Sem CORS nem URL externa.
 
 ## 1. Criar o serviço (App)
 
-- **Source:** este repositório (ou upload da pasta `painel-auditor`).
+- **Source:** este repositório (`The-Indev/infinity_redes_sociais`), branch `main`.
 - **Build:**
-  - Build Context / pasta: `painel-auditor`
   - Método: **Dockerfile**
-  - Dockerfile: `Dockerfile.easypanel`
+  - Dockerfile: `Dockerfile` (raiz — detectado por padrão, **não** precisa mexer)
+  - Build context: raiz do repositório (padrão)
 - **Porta exposta:** `80` (aponte o domínio do EasyPanel para a porta 80).
+
+> O app fica na subpasta `painel-auditor/`, mas o `Dockerfile` da raiz já
+> referencia ela. Não configure subpasta de build.
 
 ## 2. Variáveis de ambiente
 
